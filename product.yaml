@@ -12,7 +12,7 @@ spec:
       labels:
         app: product
     spec:
-	    serviceAccountName: apdev-sa
+      serviceAccountName: apdev-sa
       containers:
         - name: product
           image: 000000000000.dkr.ecr.ap-northeast-2.amazonaws.com/product:latest
