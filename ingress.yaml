@@ -1,0 +1,45 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /healthcheck
+    alb.ingress.kubernetes.io/healthcheck-port: '8080'
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    alb.ingress.kubernetes.io/actions.default-404: >
+      {"Type":"fixed-response","FixedResponseConfig":{"StatusCode":"404","ContentType":"text/plain","MessageBody":"Not Found"}}
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: /v1/user
+            pathType: Prefix
+            backend:
+              service:
+                name: user-svc
+                port:
+                  number: 8080
+          - path: /v1/product
+            pathType: Prefix
+            backend:
+              service:
+                name: product-svc
+                port:
+                  number: 8080
+          - path: /v1/stress
+            pathType: Prefix
+            backend:
+              service:
+                name: stress-svc
+                port:
+                  number: 8080
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: default-404
+                port:
+                  name: use-annotation
