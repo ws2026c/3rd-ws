@@ -9,3 +9,4 @@ data:
   MYSQL_HOST: "apdev-rds-instance.abcdefghijkl.ap-northeast-2.rds.amazonaws.com"
   MYSQL_PORT: "3306"
   MYSQL_DBNAME: "dev"
+  S3_BUCKET_NAME: "apdev-bucket-125"
