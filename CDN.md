@@ -11,7 +11,9 @@ CloudFront를 생성하는 과정에서 WAF를 생성하며 원본은 S3로 생�
 - 예3: CloudFront로 접근하는 경로가 / 이고, S3에 저장되는 경로가 /images/ 등이라면 CloudFront Function 없이 S3의 원본 경로를 /images 등으로 변경
 
 ALB 원본 생성
-- 따라서 원본은 S3, ALB가 존재해야함
+- 프로토콜 : HTTP
+- 원본 경로 없음
+- 최종적으로 원본은 S3, ALB
 
 
 동작 생성
@@ -35,6 +37,6 @@ ALB 원본 생성
   - 캐싱 X
   - 원본 요청 정책 : AllViewerExceptHostHeader
 
-  ---
+---
 
-  **WAF**
+**WAF**
