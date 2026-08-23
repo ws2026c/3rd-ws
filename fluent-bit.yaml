@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -5,6 +6,30 @@ metadata:
   namespace: amazon-cloudwatch
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::602620439352:role/FluentBitCloudWatchRole
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fluent-bit-read
+rules:
+- apiGroups: [""]
+  resources:
+  - namespaces
+  - pods
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: fluent-bit-read
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: fluent-bit-read
+subjects:
+- kind: ServiceAccount
+  name: fluent-bit
+  namespace: amazon-cloudwatch
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -14,48 +39,57 @@ metadata:
 data:
   fluent-bit.conf: |
     [SERVICE]
-        Flush         1
-        Log_Level     info
-        Daemon        off
-        Parsers_File  parsers.conf
+        Flush             1
+        Log_Level         info
+        Daemon            off
+        Parsers_File      parsers.conf
 
     [INPUT]
         Name              tail
         Tag               kube.*
         Path              /var/log/containers/*.log
+        Exclude_Path      /var/log/containers/fluent-bit*, /var/log/containers/aws-node*, /var/log/containers/kube-proxy*
         Parser            cri
-        DB                /var/log/flb_kube.db
-        Mem_Buf_Limit     10MB
+        DB                /tmp/flb_container.db
+        Mem_Buf_Limit     50MB
         Skip_Long_Lines   On
+        Refresh_Interval  5
+        Read_from_Head    Off
 
     [FILTER]
         Name                kubernetes
         Match               kube.*
         Kube_URL            https://kubernetes.default.svc:443
-        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
         Kube_Tag_Prefix     kube.var.log.containers.
         Merge_Log           On
-        Keep_Log            Off
+        Keep_Log            On
         Labels              On
         Annotations         Off
 
     [FILTER]
         Name                grep
         Match               kube.*
-        Exclude             log .*healthcheck.*
+        Regex               $kubernetes['labels']['app'] ^(product|user|stress)$
 
     [FILTER]
         Name                grep
         Match               kube.*
-        Exclude             $kubernetes['namespace_name'] ^(kube-system|amazon-cloudwatch|kube-node-lease|kube-public)$
+        Exclude             log /healthcheck
+
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Remove              stream
+        Remove              logtag
+        Remove              kubernetes
 
     [OUTPUT]
         Name                cloudwatch_logs
         Match               kube.*
         region              ap-northeast-2
         log_group_name      /eks/application-logs
-        log_stream_prefix   fluentbit-
+        log_stream_prefix   eks-
+        log_stream_template $kubernetes['pod_name']
         auto_create_group   true
 
   parsers.conf: |
@@ -65,6 +99,7 @@ data:
         Regex       ^(?<time>[^ ]+) (?<stream>stdout|stderr) (?<logtag>[^ ]*) (?<log>.*)$
         Time_Key    time
         Time_Format %Y-%m-%dT%H:%M:%S.%L%z
+        Time_Keep   On
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -86,18 +121,21 @@ spec:
       containers:
       - name: fluent-bit
         image: public.ecr.aws/aws-observability/aws-for-fluent-bit:latest
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         resources:
           limits:
-            memory: 200Mi
-          requests:
-            cpu: 100m
             memory: 100Mi
+          requests:
+            cpu: 50m
+            memory: 50Mi
         volumeMounts:
         - name: config-volume
           mountPath: /fluent-bit/etc
         - name: varlog
           mountPath: /var/log
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
       volumes:
       - name: config-volume
         configMap:
@@ -105,3 +143,6 @@ spec:
       - name: varlog
         hostPath:
           path: /var/log
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/log/pods
