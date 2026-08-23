@@ -42,6 +42,14 @@
 - CloudFront 및 WAF에 관한 내용은 CDN.md 참고
 - 모니터링 관련 내용은 Monitoring.md 참고
 
+- PUT 예시
+```bash
+curl -X PUT "https://d127k4hb4p205w.cloudfront.net/v1/product" \
+  -F 'requestid="999999999999"' \
+  -F 'uuid="7c5a3c6a-758f-4bc5-9bdf-3e573a0ad729"' \
+  -F 'id="dbdump500001"' \
+  -F 'image=@test.jpg;type=image/jpeg'
+```
 ---
 
 - 작년 기준 단순 트래픽량은 stress가 가장 컸으며, product, user에는 트래픽과 함께 비정상 요청 발생
