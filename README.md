@@ -13,6 +13,7 @@
   - 보안 그룹, 사용자 지정 파라미터 그룹, 서브넷 그룹을 미리 생성 후 진행
   - 권장 파라미터 그룹 (max_prepared_stmt_count -> 약 60000, innodb_flush_log_at_trx_commit -> 약 2, max_connections -> 200~600 정도)
   - MySQL 접속 명령 : mysql -h <RDS_URL> -u <RDS_USERNAME> -p
+    - 문제지를 참고하여 테이블 2개 생성
   - MySQL 인덱스 삽입 : CREATE INDEX email_index ON user (email);
   - MySQL 데이터 대량 삽입 : source load_user.dump
   
