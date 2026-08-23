@@ -22,7 +22,7 @@
   - 예2: CloudFront로 접근하는 경로와 S3에 저장되는 경로가 같다면 CloudFront Function과 원본 경로 설정이 필요 없음
   - 예3: CloudFront로 접근하는 경로가 / 이고, S3에 저장되는 경로가 /images 등이라면 CloudFront Function 없이 S3의 원본 경로를 /images 등으로 변경
 
-- Dockerfile 예시
+- Dockerfile 예시 (예: stress)
   ```dockerfile
   FROM public.ecr.aws/amazonlinux/amazonlinux:2023
 
@@ -40,3 +40,8 @@
 - EKS 및 app에 관한 내용은 EKS.md 참고
 - CloudFront 및 WAF에 관한 내용은 CDN.md 참고
 - 모니터링 관련 내용은 Monitoring.md 참고
+
+---
+
+- 작년 기준 단순 트래픽량은 stress가 가장 컸으며, product, user에는 트래픽과 함께 비정상 요청 발생
+- 1시간 안에 구축을 못끝낸다면 EKS와 CloudFront 부분을 먼저 구축하는게 우선임 (최소한 요청을 받을 준비가 되어있어야 함)
