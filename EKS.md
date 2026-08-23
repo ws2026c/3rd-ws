@@ -31,7 +31,8 @@ eksctl create iamserviceaccount \
 --approve
 ```
 2. k8s/ 폴더를 참고하여 configmap -> user, stress, product -> ingress -> nodeclass -> nodepool 순 apply
-  - configmap은 환경변수 값 변경, user, product, stress는 ECR 변경이 필요 
+  - configmap은 환경변수 값 변경, user, product, stress는 ECR 변경이 필요
+  - **만약 문제지에서 요구하는 Product 앱의 환경 변수가 있다면 configmap.yaml의 S3_BUCKET_NAME 대신 문제지에 지정된 환경변수 키로 바꿔주어야 함.** 
   - 참고: k8s/user.yaml 에는 Deployment, HPA, Service가 한번에 들어있음.
 
     - 늘어날 수 있는 각 Pod 수를 조절하려면 HPA 부분에 minReplicas와 maxReplicas를 조절하면 됨 (예: minReplicas 2, maxReplicas 6) -> 대회 당일 트래픽을 분석해서 결정
