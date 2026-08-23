@@ -21,21 +21,21 @@ eksctl create iamserviceaccount \
 
 이후 CloudWatch의 로그 분석에서 아래 쿼리로 로그 조회
 
-- 전체 로그 조회
+- 전체 로그 조회 (예: user)
 ```graphql
 SOURCE '/eks/application-logs' START=-1w END=0s
-| fields @timestamp, @message
-| filter @message like /user-deploy/ or @message like /user/
+| fields @timestamp, @logStream, @message
+| filter @logStream like /user/ or @message like /user/
 | filter @message not like /output:cloudwatch_logs/
 | sort @timestamp desc
 | limit 200
 ```
 
-- 4xx, 5xx 로그 조회
+- 4xx, 5xx 로그 조회 (예: user)
 ```graphql
 SOURCE '/eks/application-logs' START=-1w END=0s
-| fields @timestamp, @message
-| filter (@message like /user-deploy/ or @message like /user/)
+| fields @timestamp, @logStream, @message
+| filter (@logStream like /user/ or @message like /user/)
 | filter @message not like /output:cloudwatch_logs/
 | filter @message like /( 4\d{2} | 5\d{2} | "status":\s*[45]\d{2}|HTTP\/[12]\.[01]" [45]\d{2})/
 | sort @timestamp desc
