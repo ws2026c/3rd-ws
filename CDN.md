@@ -46,7 +46,7 @@ ALB 원본 생성
 **WAF**
 - CloudFront에서 같이 생성된 ACL에 CommonRuleSet(Core rule set), KnownBadInputsRuleSet AmazonIpReputationList 등이 있는데, 추가로 SQL database 관리형 규칙을 추가(필수)
 - (경기 중 분석) 로그에 User-Agent: bot-attack 등과 함께 비정상 요청이 발견되는 경우 사용자 지정 규칙 -> 사용자 지정 규칙 추가하여 작업 : Block(문과 일치), 검사 : 단일 헤더, 헤더 필드 이름 : User-Agent, 일치 시킬 문자열 : bot-attack(문자열과 정확히 일치) 등으로 설정 후 사용자 지정 응답에서 403 활성
-- (해당 비정상 요청이 들어올 경우) Product의 PUT에서 비정상적인 Content-Type을 막기 위해 AND 조건으로 구성
+- (해당 비정상 요청이 들어올 경우) Product의 PUT에서 비정상적인 Body를 막기 위해 AND 조건으로 구성
   - 작업 : Block (모든 문과 일치(AND))
   - Statement 1 - URL 경로가 /v1/product와 정확하게 일치하고
   - Statement 2 - HTTP 메서드가 PUT과 정확하게 일치하며 (statement 2)
