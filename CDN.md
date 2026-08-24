@@ -50,7 +50,7 @@ ALB 원본 생성
   - 작업 : Block (모든 문과 일치(AND))
   - Statement 1 - URL 경로가 /v1/product와 정확하게 일치하고
   - Statement 2 - HTTP 메서드가 PUT과 정확하게 일치하며 (statement 2)
-  - Statement 3 - 단일 헤더 content-type이 (json|text|urlencoded|script|shell|sh|xml|octet-stream) 라는 정규 표현식과 일치하는지 검사
+  - Statement 3 - 본문이 (?i)(system\(|exec\(|<script|/bin/sh|/bin/bash) 라는 **정규 표현식과 일치**하는지 검사
   - 사용자 지정 응답 : 403
 - (해당 비정상 요청이 들어올 경우) Product의 PUT에서 비정상적인 용량의 요청이 들어올 경우
   - 작업 : Block (모든 문과 일치(AND))
@@ -58,3 +58,8 @@ ALB 원본 생성
   - Statement 2 - HTTP 메서드가 PUT과 정확하게 일치하며
   - Statement 3 - 본문이 2097152보다 초과의 크기일 때
   - 사용자 지정 응답 : 403
+- **중요**
+  - 만약 정상적인 요청에 대해 403이 **비정상적**으로 발생할 경우 :
+      - SQL database의 SQLi_BODY의 Block을 Count로 변경
+      - Core rule set의 SizeRestrictions_BODY와 CrossSiteScripting_BODY의 Block을 Count로 변경
+      - 이후에도 문제가 해결되지 않으면 사용자 지정 규칙을 제거하거나 변경해야 함.
