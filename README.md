@@ -42,13 +42,26 @@
 - CloudFront 및 WAF에 관한 내용은 CDN.md 참고
 - 모니터링 관련 내용은 Monitoring.md 참고
 
-- PUT 예시
+- PUT 테스트 예시
+- 만약 body에서 이미지의 필드(키)가 image가 아니라면 마지막 줄의 image= 를 바꿔야 함. (예(file): 'file=@test.jpg;type=image/jpeg') 
 ```bash
 curl -X PUT "https://d127k4hb4p205w.cloudfront.net/v1/product" \
   -F 'requestid="999999999999"' \
   -F 'uuid="7c5a3c6a-758f-4bc5-9bdf-3e573a0ad729"' \
   -F 'id="dbdump500001"' \
   -F 'image=@test.jpg;type=image/jpeg'
+```
+
+**(만약 base64 방식이라면 다음 스크립트 사용)**
+```bash
+curl -X PUT "https://d127k4hb4p205w.cloudfront.net/v1/product" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"requestid\": \"999999999999\",
+    \"uuid\": \"7c5a3c6a-758f-4bc5-9bdf-3e573a0ad729\",
+    \"id\": \"dbdump500001\",
+    \"image\": \"$(base64 -w 0 image.jpg)\"
+  }"
 ```
 ---
 
