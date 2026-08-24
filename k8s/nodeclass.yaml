@@ -4,12 +4,12 @@ metadata:
   name: default
 spec:
   amiFamily: Bottlerocket
-  role: KarpenterNodeRole-test-eks
+  role: KarpenterNodeRole-<클러스터이름>
   amiSelectorTerms:
     - alias: bottlerocket@latest
   subnetSelectorTerms:
     - tags:
-        karpenter.sh/discovery: apdev-eks-cluster
+        karpenter.sh/discovery: <클러스터이름>
   securityGroupSelectorTerms:
     - tags:
-        karpenter.sh/discovery: apdev-eks-cluster
+        karpenter.sh/discovery: <클러스터이름>
